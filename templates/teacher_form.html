@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf8">
+        <title>Making Schedules</title>
+        <link rel="stylesheet" href="/static/stylesheet.css">
+    </head>
+    <body>
+        <header>
+            <h1>Input {{ name }} information. </h1>
+        </header>
+        <main>
+            <div id="date_update">
+                <form action="{{ url_for('teacher_form', name=name) }}" method="post">
+                    <select name="year">
+                        
+                        {% for i in range(2020, 2051) %}
+                            {% if i == date_list[0] %}
+                                <option value="{{ i }}" selected>{{ i }}</option>
+                            {% else %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    year/
+                    <select name="month">
+                        {% for i in range(1, 13) %}
+                            {% if i == date_list[1] %}
+                                <option value="{{ i }}" selected>{{ i }}</option>
+                            {% else %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    month
+                    <button type="submit">Update</button>
+                </form>
+            </div>
+
+            <div id="mothly_schedule">
+                <form method="POST" action="{{ url_for('teacher_form', name=name) }}">
+                    <input type="hidden" name="year" value="{{ date_list[0] }}">
+                    <input type="hidden" name="month" value="{{ date_list[1] }}">
+                    <input type="hidden" name="ones_subject" value="1">
+                    <table border="1">
+                        <tr>
+                            {% for i in range(5) %}
+                                {% if i == 0 %}
+                                    <th>----</th>
+                                {% else %}
+                                    <th>{{ i }} class</th>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% for i in range(1, date_list[3] + 1) %}
+                            <tr>
+                                {% for j in range(5) %}
+                                    {% if j == 0 %}
+                                        <td>{{ i }} ({{ weekdays[(date_list[2] + i - 1) % 7] }})</td>
+                                    {% else %}
+                                        <td>
+                                            <select name="subject_{{ i }}_{{ j - 1 }}">
+                                                {% for k in range(2) %}
+                                                    {% if ones_subject[i - 1][j - 1] == k %}
+                                                        <option value="{{ k }}" selected>{{ subject[k] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ k }}">{{ subject[k] }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <button type="submit">Preserve</button>
+                </form>
+                <form method="post" action="{{ url_for('teacher_info', name=name) }}">
+                    <button type="submit">Info</button>
+                </form>
+            </div>
+        </main>
+        <footer>
+            <a href="{{ url_for('teachers') }}">Return</a>
+        </footer>
+    </body>
+</html>

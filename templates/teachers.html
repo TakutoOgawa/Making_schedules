@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf8">
+        <title>Making Schedules</title>
+        <link rel="stylesheet" href="/static/stylesheet.css">
+    </head>
+    <body>
+        <header>
+            <h1>Choose a {{ job }} name. </h1>
+        </header>
+        <main>
+            {% if persons %}
+                {% for person in persons %}
+                    <li>
+                        <a href="{{ url_for('teacher_form', name=person[1]) }}">
+                            {{ person[1] }}</a>
+                        <form method="post" action="{{ url_for('delete') }}">
+                            <input type="hidden" value="{{ person[1] }}">
+                            <button type="submit">
+                                Delete</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <h2>No {{ job }} here..</h2>
+            {% endif %}
+            <p>Add a newly {{ job }}</p>
+            <p>Name: </p>
+            <form method="post" action="{{ url_for('register') }}">
+                <input type="text" name="name">
+                <input type="hidden" name="job" value="{{ job }}">
+                <button type="submit">Add</button>
+            </form>
+        </main>
+        <footer>
+            <a href="{{ url_for('index') }}">Return</a>
+        </footer>
+    </body>
+</html>

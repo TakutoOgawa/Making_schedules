@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf8">
+        <title>info</title>
+        <link rel="stylesheet" href="/static/stylesheet.css">
+    </head>
+    <body>
+        <header>
+            <h1>{{ name }}'s fundamental information. </h1>
+            
+            <h2>Evaluate his ability to teach each subject. 
+                <br>
+                (9 is supremum, 0 is nadir. )
+            </h2>
+        </header>
+        <main>
+            <form method="POST" action="{{ url_for('update_info', name=name) }}">
+                <table border="1">
+                    <tr>
+                        {% for i in range(1, 6) %}
+                            <th>{{ subject[i] }}</th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        {% for i in range(1, 6) %}
+                            <td>
+                                <select name="{{ i }}">
+                                    {% for j in range(10) %}
+                                        {% if ability[i - 1] == j %}
+                                            <option value="{{ j }}" selected>{{ j }}</option>
+                                        {% else %}
+                                            <option value="{{ j }}">{{ j }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </table>
+                <button type="submit">Preserve</button>
+            </form>
+        </main>
+        <footer>
+            <a href="{{ url_for('teacher_form', name=name) }}">Return</a>
+        </footer>
+    </body>
+</html>

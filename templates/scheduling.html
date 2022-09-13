@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf8">
+        <title>Making Schedules</title>
+        <link rel="stylesheet" href="/static/stylesheet.css">
+    </head>
+    <body>
+        <header>
+            <h1>Finally making schedules! </h1>
+        </header>
+        <main>
+            Choose a date. 
+            <div id="make_schedule">
+                <form action="{{ url_for('making') }}" method="post">
+                    <select name="year">
+                        {% for i in range(2020, 2051) %}
+                            {% if i == today[0] %}
+                                <option value="{{ i }}" selected>{{ i }}</option>
+                            {% else %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    year/
+                    <select name="month">
+                        {% for i in range(1, 13) %}
+                            {% if i == today[1] %}
+                                <option value="{{ i }}" selected>{{ i }}</option>
+                            {% else %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    month/
+                    <select name="day">
+                        {% for i in range(1, days + 1) %}
+                            {% if i == today[2] %}
+                                <option value="{{ i }}" selected>{{ i }}</option>
+                            {% else %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    day
+                    <button type="submit">Make!</button>
+                </form>
+            </div>
+        </main>
+        <footer>
+            <a href="{{ url_for('index') }}">Return</a>
+        </footer>
+    </body>
+</html>
