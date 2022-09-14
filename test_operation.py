@@ -7,7 +7,8 @@ con = sqlite3.connect(DB)
 
 
 con.execute("""
-            DELETE FROM students
+            UPDATE students
+            SET chemistry = 0
             """
             )
 

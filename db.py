@@ -10,7 +10,7 @@ def create_table():
                     id INTEGER PRIMARY KEY, 
                     name STRING UNIQUE, 
                     belonging STRING, 
-                    chemistry INT
+                    chemistry INT DEFAULT 0
                     )
                 """
                 )
@@ -45,11 +45,11 @@ def create_table():
                 for day in range(1, days + 1):
                     for class_num in range(4):
                         day_id = make_day_id(year, month, day, class_num)
-                        con.execute("""
+                        con.execute(f"""
                                     INSERT INTO all_date(day, info)
-                                    SELECT {}, 0
-                                    WHERE NOT EXISTS (SELECT 1 FROM all_date WHERE day = {})
-                                    """.format(day_id, day_id)
+                                    SELECT {day_id}, 0
+                                    WHERE NOT EXISTS (SELECT 1 FROM all_date WHERE day = {day_id})
+                                    """
                                     )
 
     con.commit()
@@ -60,27 +60,27 @@ def preserve_date(name, job, date_list, day, class_num, subject_num):
     con = sqlite3.connect(DB)
     year, month = date_list[0], date_list[1]
     day_id = make_day_id(year, month, day, class_num)
-    student_id = con.execute("""
-                            SELECT id FROM {}
-                            WHERE name = "{}"
-                            """.format(job + "s", name)
+    student_id = con.execute(f"""
+                            SELECT id FROM {job}s
+                            WHERE name = "{name}"
+                            """
                             ).fetchone()[0]
 
-    info = con.execute("""
+    info = con.execute(f"""
                         SELECT info FROM all_date
-                        WHERE day = {}
-                        """.format(day_id)
+                        WHERE day = {day_id}
+                        """
                         ).fetchone()[0]
 
     his_info = info // 10 ** (student_id - 1)
     his_info %= 10
     info += (subject_num - his_info) * 10 ** (student_id - 1)
 
-    con.execute("""
+    con.execute(f"""
                 UPDATE all_date
-                SET info = {}
-                WHERE day = {}
-                """.format(info, day_id)
+                SET info = {info}
+                WHERE day = {day_id}
+                """
                 )
     con.commit()
     con.close()
@@ -90,7 +90,7 @@ def get_subject(name, job, date_list, day, class_num):
     year, month = date_list[0], date_list[1]
     day_id = make_day_id(year, month, day, class_num)
     day_info = get_day_info(day_id)
-    student_id = get_ones_info(name, job)[1]
+    student_id = get_ones_info(name, job)[0]
 
     his_info = day_info // 10 ** (student_id - 1)
     his_info %= 10
@@ -100,9 +100,9 @@ def get_subject(name, job, date_list, day, class_num):
 def get_persons(job):
     flag = 1 if job == "teacher" else 0
     con = sqlite3.connect(DB)
-    persons = con.execute("""
-                            SELECT * FROM {}
-                            """.format(job + "s", flag)
+    persons = con.execute(f"""
+                            SELECT * FROM {job}s
+                            """
                             ).fetchall()
     con.close() 
     return persons
@@ -111,10 +111,10 @@ def get_persons(job):
 def delete_from_db(name, job):
     con = sqlite3.connect(DB)
 
-    person_id = con.execute("""
-                            SELECT id FROM {}
-                            WHERE name = "{}"
-                            """.format(job + "s", name)
+    person_id = con.execute(f"""
+                            SELECT id FROM {job}s
+                            WHERE name = "{name}"
+                            """
                             ).fetchone()[0]
 
     con.execute("""
@@ -145,11 +145,11 @@ def register_person(name, job):
     if id is None:
         id = 1
 
-    con.execute("""
-                INSERT INTO {}s (id, name)
-                SELECT {}, "{}"
-                WHERE NOT EXISTS (SELECT 1 FROM {}s WHERE name = "{}")
-                """.format(job, id, name, job, name)
+    con.execute(f"""
+                INSERT INTO {job}s (id, name)
+                SELECT {id}, "{name}"
+                WHERE NOT EXISTS (SELECT 1 FROM {job}s WHERE name = "{name}")
+                """
                 )
 
     con.commit()
@@ -159,11 +159,11 @@ def register_person(name, job):
 def update(name, job, subject):
     con = sqlite3.connect(DB)
 
-    con.execute("""
-                UPDATE {}s
-                SET subject = {}
-                WHERE name = "{}"
-                """.format(job, subject, name)
+    con.execute(f"""
+                UPDATE {job}s
+                SET subject = {subject}
+                WHERE name = "{name}"
+                """
                 )
     
     con.commit()
@@ -172,38 +172,55 @@ def update(name, job, subject):
 
 def get_day_info(day_id):
     con = sqlite3.connect(DB)
-    day_info = con.execute("""
+    day_info = con.execute(f"""
                             SELECT info FROM all_date
-                            WHERE day = {}
-                            """.format(day_id)
-                            ).fetchone()[1]
+                            WHERE day = {day_id}
+                            """
+                            ).fetchone()[0]
     con.close()
     return day_info
 
 def get_ones_info(name, job):
     con = sqlite3.connect(DB)
-    ones_info = con.execute("""
-                            SELECT * FROM {}s
-                            WHERE name = "{}"
-                            """.format(job, name)
+    ones_info = con.execute(f"""
+                            SELECT * FROM {job}s
+                            WHERE name = "{name}"
+                            """
                             ).fetchone()
     con.close()
     return ones_info
 
 def search_name(id):
     con = sqlite3.connect(DB)
-    name1 = con.execute("""
+    name1 = con.execute(f"""
                         SELECT name
                         FROM students
-                        """.format(id)
-                        ).fetchone()[0]
-    name2 = con.execute("""
+                        WHERE id = {id}
+                        """
+                        ).fetchone()
+    name2 = con.execute(f"""
                         SELECT name
-                        FROM students
-                        """.format(id)
-                        ).fetchone()[0]
+                        FROM teachers
+                        WHERE id = {id}
+                        """
+                        ).fetchone()
     con.close()
     if name1 is not None:
-        return name1, "student"
+        return name1[0], "student"
     else:
-        return name2, "teacher"
+        return name2[0], "teacher"
+
+def get_persons_info(id_or_name):
+    if type(id_or_name) is int:
+        type_name = "id"
+    else:
+        type_name = "name"
+    
+    con = sqlite3.connect(DB)
+    info = con.execute(f"""
+                        SELECT {type_name}
+                        FROM students UNION teachers
+                        WHERE {type_name} == {id_or_name}
+                        """)
+    con.close()
+    return info

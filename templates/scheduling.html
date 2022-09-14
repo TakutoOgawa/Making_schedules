@@ -12,10 +12,10 @@
         <main>
             Choose a date. 
             <div id="make_schedule">
-                <form action="{{ url_for('making') }}" method="post">
+                <form action="{{ url_for('management') }}" method="post">
                     <select name="year">
                         {% for i in range(2020, 2051) %}
-                            {% if i == today[0] %}
+                            {% if i == date_list[0] %}
                                 <option value="{{ i }}" selected>{{ i }}</option>
                             {% else %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -25,7 +25,7 @@
                     year/
                     <select name="month">
                         {% for i in range(1, 13) %}
-                            {% if i == today[1] %}
+                            {% if i == date_list[1] %}
                                 <option value="{{ i }}" selected>{{ i }}</option>
                             {% else %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -34,8 +34,8 @@
                     </select>
                     month/
                     <select name="day">
-                        {% for i in range(1, days + 1) %}
-                            {% if i == today[2] %}
+                        {% for i in range(1, date_list[3] + 1) %}
+                            {% if i == date_list[2] %}
                                 <option value="{{ i }}" selected>{{ i }}</option>
                             {% else %}
                                 <option value="{{ i }}">{{ i }}</option>
@@ -45,6 +45,23 @@
                     day
                     <button type="submit">Make!</button>
                 </form>
+            </div>
+            <div>
+                <table border="1">
+                    {% for teacher in g %}
+                        <tr>
+                            <td rowspan="5">{{ teacher }}</td>
+                            {% for i in range(4) %}
+                                <tr>
+                                    {% for j in range(4) %}
+                                        <td>{{ g[teacher][j][i][0] }}</td>
+                                        <td>{{ g[teacher][j][i][1] }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
             </div>
         </main>
         <footer>

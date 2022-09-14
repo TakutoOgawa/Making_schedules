@@ -3,7 +3,7 @@ import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
 from db import create_table, preserve_date, get_subject, delete_from_db, get_persons, register_person, update, get_ones_info
 from date import today_date, weekday_of_the_first_day
-from main import making_schedule
+from main import make_schedule, make_schedule_table
 
 app = Flask(__name__)
 DB = 'database.db'
@@ -157,24 +157,23 @@ def update_info(name):
     return redirect(url_for("teacher_info", name=name))
 
 
-@app.route('/management')
+@app.route('/management', methods=["GET", "POST"])
 def management():
-    today = today_date()
-    year, month = today[0], today[1]
+    if request.form.get("year") is None:
+        today = today_date()
+        year, month, day = today[0], today[1], today[2]
+    else:
+        year = int(request.form["year"])
+        month = int(request.form["month"])
+        day = int(request.form["day"])
     days = weekday_of_the_first_day(year, month)[1]
+    date_list = [year, month, day, days]
+    g = make_schedule_table(year, month, day)
     return render_template(
         "scheduling.html", 
-        today=today, 
-        days = days
-    )
-
-@app.route("/main", methods=["POST"])
-def making():
-    year = int(request.form["year"])
-    month = int(request.form["month"])
-    day = int(request.form["day"])
-    making_schedule(year, month, day)
-    return redirect("management")
+        date_list=date_list, 
+        g=g
+        )
 
 
 
