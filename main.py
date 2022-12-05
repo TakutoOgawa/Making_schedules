@@ -24,7 +24,7 @@ def make_schedule(year, month, day, class_num):
         if job == "student":
             S.append(id)
             S_name.append(name)
-            Subject.append(subject)  
+            Subject.append(subject)
         else:
             T.append(id)
             T_name.append(name)

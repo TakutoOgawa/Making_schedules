@@ -29,12 +29,12 @@ def create_table():
                     )
                 """
                 )
-    
+
     flag = con.execute("""
                     SELECT 1 FROM all_date
                     """
                     ).fetchone()
-    
+
     if flag is None:
         for year in range(2020, 2051):
             diff = [1, -2, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1]
