@@ -12,4 +12,4 @@
 *  Push F1, and choose "Dev Containers: Open folder in container."
 *  Wait minutes... 
 *  run a python file "app.py"
-*  Open "http://172.29.2.246:5050" in web browser. 
+*  Open "http://127.0.0.1:5050" in web browser. 
